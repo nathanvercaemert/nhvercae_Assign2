@@ -239,7 +239,6 @@ if search == 'astar':
                 remainingMSTWeight = minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances)
                 distToKey = distance(currentLocation, keyLocation)
                 heuristic = remainingMSTWeight + distToRemaining + distToKey
-                # heuristic = remainingMSTWeight
                 heapq.heappush(possibleNextKeys, (heuristic, keyLocation))
             nextKey = heapq.heappop(possibleNextKeys)
             nextKey = nextKey[1]
