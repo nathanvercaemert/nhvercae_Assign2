@@ -173,14 +173,13 @@ if search == 'bfs':
             isFailed = True
 if search == 'astar':
     test = 'test'
-    g = Graph()
+    gStart = Graph()
     for key in keyLocations:
-        g.add_vertex(key)
-    g.add_vertex(doorLocation)
-    print(g.vertices())
+        gStart.add_vertex(key)
+    gStart.add_vertex(doorLocation)
     # starting location -> current location
     # loop
-        # minimum spanning trees of all remaining keys - possible next key
+        # (minimum spanning trees of all remaining keys - possible next key) + distance to next possible key
         # select next key for mst with lowest weight
         # go to next key/door with bfs
 
