@@ -64,7 +64,6 @@ def harryBfs(currentLocation, nextLocation, isNavigable, isVisited, pathsExplore
         if isFailed:
             print('failure')
             sys.exit()
-            break
         pathsExplored += 1
         if possibleCurrentLocation == nextLocation:
             isVisited.fill(0)
@@ -121,25 +120,19 @@ def harryBfs(currentLocation, nextLocation, isNavigable, isVisited, pathsExplore
 
 def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplored):
     possibleCurrentLocation = currentLocation
-    possibleCurrentRow = currentLocation[0]
-    possibleCurrentColumn = currentLocation[1]
+    possibleCurrentRow = possibleCurrentLocation[0]
+    possibleCurrentColumn = possibleCurrentLocation[1]
     possiblePath = []
     mazeShape = isNavigable.shape
     numRows = mazeShape[0]
     numCols = mazeShape[1]
-    queue = deque()
+    fringe = []
     isFailed = False
     test = 0
-    while True:
-        test += 1
+    while not possibleCurrentLocation == nextLocation:
         if isFailed:
             print('failure')
             sys.exit()
-            break
-        pathsExplored += 1
-        if possibleCurrentLocation == nextLocation:
-            isVisited.fill(0)
-            return (len(possiblePath), possiblePath)
         if not isVisited[possibleCurrentRow, possibleCurrentColumn]:
             isVisited[possibleCurrentRow, possibleCurrentColumn] = True
             leftCol = possibleCurrentColumn
@@ -150,7 +143,8 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             left = (possibleCurrentRow, leftCol)
             leftPath = possiblePath.copy()
             leftPath.append(left)
-            queue.append((left, leftPath))
+            possibleAStar = len(leftPath) + distance(left, nextLocation)
+            heapq.heappush(fringe, (possibleAStar, (left, leftPath)))
             rightCol = possibleCurrentColumn
             if rightCol < (numCols - 1):
                 rightCol += 1
@@ -159,7 +153,8 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             right = (possibleCurrentRow, rightCol)
             rightPath = possiblePath.copy()
             rightPath.append(right)
-            queue.append((right, rightPath))
+            possibleAStar = len(rightPath) + distance(right, nextLocation)
+            heapq.heappush(fringe, (possibleAStar, (right, rightPath)))
             upRow = possibleCurrentRow
             if upRow > 0:
                 upRow -= 1
@@ -168,7 +163,8 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             up = (upRow, possibleCurrentColumn)
             upPath = possiblePath.copy()
             upPath.append(up)
-            queue.append((up, upPath))
+            possibleAStar = len(upPath) + distance(up, nextLocation)
+            heapq.heappush(fringe, (possibleAStar, (up, upPath)))
             downRow = possibleCurrentRow
             if downRow < (numRows - 1):
                 downRow += 1
@@ -177,17 +173,18 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             down = (downRow, possibleCurrentColumn)
             downPath = possiblePath.copy()
             downPath.append(down)
-            queue.append((down, downPath))
-        if queue:
-            # if test > 7 and test < 9:
-            #     print(queue[0])
-            currentTest = queue.popleft()
-            possibleCurrentLocation = currentTest[0]
-            possiblePath = currentTest[1]
+            possibleAStar = len(downPath) + distance(down, nextLocation)
+            heapq.heappush(fringe, (possibleAStar, (down, downPath)))
+        if fringe:
+            fromFringe = heapq.heappop(fringe)
+            possibleCurrentLocation = fromFringe[1][0]
             possibleCurrentRow = possibleCurrentLocation[0]
             possibleCurrentColumn = possibleCurrentLocation[1]
+            possiblePath = fromFringe[1][1]
         else:
             isFailed = True
+    isVisited.fill(0)
+    return (len(possiblePath), possiblePath)
 
 
 def extract_table(f):
