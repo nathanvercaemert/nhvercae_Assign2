@@ -48,8 +48,8 @@ def distToMST(remainingAfterKeyRemoved, keyLocation):
     return heapq.heappop(distancesToKey)
 
 
-def harryAstar(currentLocation, nextLocation, isNavigable, isVisited):
-    possibleLocation = currentLocation
+def harryBfs(currentLocation, nextLocation, isNavigable, isVisited, pathsExplored):
+    possibleCurrentLocation = currentLocation
     possibleCurrentRow = currentLocation[0]
     possibleCurrentColumn = currentLocation[1]
     possiblePath = []
@@ -58,52 +58,134 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited):
     numCols = mazeShape[1]
     queue = deque()
     isFailed = False
+    test = 0
     while True:
+        test += 1
         if isFailed:
-            print(possiblePath)
             print('failure')
             sys.exit()
             break
-        # pathsExplored += 1
-        if possibleLocation is nextLocation:
+        pathsExplored += 1
+        if possibleCurrentLocation == nextLocation:
             isVisited.fill(0)
             return (len(possiblePath), possiblePath)
         if not isVisited[possibleCurrentRow, possibleCurrentColumn]:
             isVisited[possibleCurrentRow, possibleCurrentColumn] = True
             leftCol = possibleCurrentColumn
-            if possibleCurrentColumn > 0:
+            if leftCol > 0:
                 leftCol -= 1
+                if not isNavigable[possibleCurrentRow, leftCol]:
+                    leftCol = possibleCurrentColumn
             left = (possibleCurrentRow, leftCol)
             leftPath = possiblePath.copy()
             leftPath.append(left)
             queue.append((left, leftPath))
             rightCol = possibleCurrentColumn
-            if possibleCurrentColumn < (numCols - 1):
+            if rightCol < (numCols - 1):
                 rightCol += 1
+                if not isNavigable[possibleCurrentRow, rightCol]:
+                    rightCol = possibleCurrentColumn
             right = (possibleCurrentRow, rightCol)
             rightPath = possiblePath.copy()
             rightPath.append(right)
             queue.append((right, rightPath))
             upRow = possibleCurrentRow
-            if possibleCurrentRow > 0:
+            if upRow > 0:
                 upRow -= 1
+                if not isNavigable[upRow, possibleCurrentColumn]:
+                    upRow = possibleCurrentRow
             up = (upRow, possibleCurrentColumn)
             upPath = possiblePath.copy()
             upPath.append(up)
             queue.append((up, upPath))
             downRow = possibleCurrentRow
-            if possibleCurrentRow < (numRows - 1):
+            if downRow < (numRows - 1):
                 downRow += 1
-            down = (downRow, possibleCurrentRow)
+                if not isNavigable[downRow, possibleCurrentColumn]:
+                    downRow = possibleCurrentRow
+            down = (downRow, possibleCurrentColumn)
             downPath = possiblePath.copy()
             downPath.append(down)
             queue.append((down, downPath))
         if queue:
+            # if test > 7 and test < 9:
+            #     print(queue[0])
             currentTest = queue.popleft()
-            possibleLocation = currentTest[0]
+            possibleCurrentLocation = currentTest[0]
             possiblePath = currentTest[1]
-            possibleCurrentRow = possibleLocation[0]
-            possibleCurrentColumn = possibleLocation[1]
+            possibleCurrentRow = possibleCurrentLocation[0]
+            possibleCurrentColumn = possibleCurrentLocation[1]
+        else:
+            isFailed = True
+
+
+def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplored):
+    possibleCurrentLocation = currentLocation
+    possibleCurrentRow = currentLocation[0]
+    possibleCurrentColumn = currentLocation[1]
+    possiblePath = []
+    mazeShape = isNavigable.shape
+    numRows = mazeShape[0]
+    numCols = mazeShape[1]
+    queue = deque()
+    isFailed = False
+    test = 0
+    while True:
+        test += 1
+        if isFailed:
+            print('failure')
+            sys.exit()
+            break
+        pathsExplored += 1
+        if possibleCurrentLocation == nextLocation:
+            isVisited.fill(0)
+            return (len(possiblePath), possiblePath)
+        if not isVisited[possibleCurrentRow, possibleCurrentColumn]:
+            isVisited[possibleCurrentRow, possibleCurrentColumn] = True
+            leftCol = possibleCurrentColumn
+            if leftCol > 0:
+                leftCol -= 1
+                if not isNavigable[possibleCurrentRow, leftCol]:
+                    leftCol = possibleCurrentColumn
+            left = (possibleCurrentRow, leftCol)
+            leftPath = possiblePath.copy()
+            leftPath.append(left)
+            queue.append((left, leftPath))
+            rightCol = possibleCurrentColumn
+            if rightCol < (numCols - 1):
+                rightCol += 1
+                if not isNavigable[possibleCurrentRow, rightCol]:
+                    rightCol = possibleCurrentColumn
+            right = (possibleCurrentRow, rightCol)
+            rightPath = possiblePath.copy()
+            rightPath.append(right)
+            queue.append((right, rightPath))
+            upRow = possibleCurrentRow
+            if upRow > 0:
+                upRow -= 1
+                if not isNavigable[upRow, possibleCurrentColumn]:
+                    upRow = possibleCurrentRow
+            up = (upRow, possibleCurrentColumn)
+            upPath = possiblePath.copy()
+            upPath.append(up)
+            queue.append((up, upPath))
+            downRow = possibleCurrentRow
+            if downRow < (numRows - 1):
+                downRow += 1
+                if not isNavigable[downRow, possibleCurrentColumn]:
+                    downRow = possibleCurrentRow
+            down = (downRow, possibleCurrentColumn)
+            downPath = possiblePath.copy()
+            downPath.append(down)
+            queue.append((down, downPath))
+        if queue:
+            # if test > 7 and test < 9:
+            #     print(queue[0])
+            currentTest = queue.popleft()
+            possibleCurrentLocation = currentTest[0]
+            possiblePath = currentTest[1]
+            possibleCurrentRow = possibleCurrentLocation[0]
+            possibleCurrentColumn = possibleCurrentLocation[1]
         else:
             isFailed = True
 
@@ -283,8 +365,8 @@ if search == 'astar':
     remainingKeyLocations = keyLocations.copy()
     # while True:
     steps = 0
-    path = ()
-    keyOrder = ()
+    path = []
+    keyOrder = []
     while remainingKeyLocations:
         nextKey = ()
         nextKeyLocation = ()
@@ -297,7 +379,8 @@ if search == 'astar':
                 remainingAfterKeyRemoved.remove(keyLocation)
                 distToRemaining = distToMST(remainingAfterKeyRemoved, keyLocation)
                 remainingMSTWeight = minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances)
-                astarToNextLocation = harryAstar(currentLocation, keyLocation, isNavigable, isVisited)
+                astarToNextLocation = harryAstar(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
+                # astarToNextLocation = harryBfs(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
                 distToKey = astarToNextLocation[0]
                 heuristic = remainingMSTWeight + distToRemaining + distToKey
                 heapq.heappush(possibleNextKeys, (heuristic, (keyLocation, astarToNextLocation)))
@@ -306,21 +389,23 @@ if search == 'astar':
             nextKeyLocation = nextKey[0]
             nextKeySteps = nextKey[1][0]
             nextKeyPath = nextKey[1][1]
-            remainingKeyLocations.remove(nextKey)
+            remainingKeyLocations.remove(nextKeyLocation)
         else:
             # get the last key location
             nextKeyLocation = next(iter(remainingKeyLocations))
-            astarToNextLocation = harryAstar(currentLocation, nextKeyLocation, isNavigable, isVisited)
+            astarToNextLocation = harryAstar(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
+            # astarToNextLocation = harryBfs(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
             nextKeySteps = astarToNextLocation[0]
-            nextKeyPath = bfsToPossibleNextKey[1]
+            nextKeyPath = astarToNextLocation[1]
             remainingKeyLocations.remove(nextKeyLocation)
         currentLocation = nextKeyLocation
         steps += nextKeySteps
         path.append(nextKeyPath)
         keyOrder.append(nextKeyLocation)
-    bfsToDoor = harryAstar(currentLocation, doorLocation, isNavigable, isVisited)
-    steps += bfsToDoor[0]
-    path.append(bfsToDoor[1])
+    astarToDoor = harryAstar(currentLocation, doorLocation, isNavigable, isVisited, pathsExplored)
+    # astarToDoor = harryBfs(currentLocation, doorLocation, isNavigable, isVisited, pathsExplored)
+    steps += astarToDoor[0]
+    path.append(astarToDoor[1])
     print(keyOrder)
     print(steps)
     print(path)
