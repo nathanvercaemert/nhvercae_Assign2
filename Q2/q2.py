@@ -40,10 +40,10 @@ def minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances):
     return weight
 
 
-def distToMST(remainingAfterKeyRemoved, keyLocation):
+def distToMST(remainingAfterKeyRemoved, keyLocation, distances):
     distancesToKey = []
     for remaining in remainingAfterKeyRemoved:
-        dist = distance(keyLocation, remaining)
+        dist = distances[keyLocation, remaining]
         heapq.heappush(distancesToKey, dist)
     return heapq.heappop(distancesToKey)
 
@@ -355,10 +355,13 @@ if search == 'astar':
     gStart.add_vertex(doorLocation)
     gStart.add_vertex(currentLocation)
     distances = {}
+    dummyPathsExplored = 0
     for u in gStart.vertices():
         for v in gStart.vertices():
-            distances[(u, v)] = distance(u, v)
-            distances[(v, u)] = distance(u, v)
+            dist = harryAstar(u, v, isNavigable, isVisited, dummyPathsExplored)
+            dist = dist[0]
+            distances[(u, v)] = dist
+            distances[(v, u)] = dist
     remainingKeyLocations = keyLocations.copy()
     # while True:
     steps = 0
@@ -374,7 +377,7 @@ if search == 'astar':
             for keyLocation in remainingKeyLocations:
                 remainingAfterKeyRemoved = remainingKeyLocations.copy()
                 remainingAfterKeyRemoved.remove(keyLocation)
-                distToRemaining = distToMST(remainingAfterKeyRemoved, keyLocation)
+                distToRemaining = distToMST(remainingAfterKeyRemoved, keyLocation, distances)
                 remainingMSTWeight = minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances)
                 astarToNextLocation = harryAstar(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
                 # astarToNextLocation = harryBfs(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
