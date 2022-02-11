@@ -355,10 +355,13 @@ if search == 'astar':
     gStart.add_vertex(doorLocation)
     gStart.add_vertex(currentLocation)
     distances = {}
+    dummyPathsExplored = 0
     for u in gStart.vertices():
         for v in gStart.vertices():
-            distances[(u, v)] = distance(u, v)
-            distances[(v, u)] = distance(u, v)
+            dist = harryAstar(u, v, isNavigable, isVisited, dummyPathsExplored)
+            dist = dist[0]
+            distances[(u, v)] = dist
+            distances[(v, u)] = dist
     remainingKeyLocations = keyLocations.copy()
     # while True:
     steps = 0
