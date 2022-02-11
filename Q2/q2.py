@@ -416,4 +416,4 @@ if search == 'astar':
         if u == 0:
             continue
         path.append(indexNames[u])
-    # print(path)
+    print(path)
