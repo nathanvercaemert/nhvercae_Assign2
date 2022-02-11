@@ -369,32 +369,16 @@ if search == 'astar':
         nextKeyLocation = ()
         nextKeySteps = 0
         nextKeyPath = ()
-        if (len(remainingKeyLocations) > 1):
-            possibleNextKeys = []
-            for keyLocation in remainingKeyLocations:
-                remainingAfterKeyRemoved = remainingKeyLocations.copy()
-                remainingAfterKeyRemoved.remove(keyLocation)
-                distToRemaining = distToMST(remainingAfterKeyRemoved, keyLocation)
-                remainingMSTWeight = minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances)
-                astarToNextLocation = harryAstar(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
-                # astarToNextLocation = harryBfs(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
-                distToKey = astarToNextLocation[0]
-                heuristic = remainingMSTWeight + distToRemaining + distToKey
-                heapq.heappush(possibleNextKeys, (heuristic, (keyLocation, astarToNextLocation)))
-            nextKey = heapq.heappop(possibleNextKeys)
-            nextKey = nextKey[1]
-            nextKeyLocation = nextKey[0]
-            nextKeySteps = nextKey[1][0]
-            nextKeyPath = nextKey[1][1]
-            remainingKeyLocations.remove(nextKeyLocation)
-        else:
-            # get the last key location
-            nextKeyLocation = next(iter(remainingKeyLocations))
-            astarToNextLocation = harryAstar(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
-            # astarToNextLocation = harryBfs(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
-            nextKeySteps = astarToNextLocation[0]
-            nextKeyPath = astarToNextLocation[1]
-            remainingKeyLocations.remove(nextKeyLocation)
+        nextKeyLocationHeap = []
+        for key in remainingKeyLocations:
+            heapq.heappush(nextKeyLocationHeap, (distances[currentLocation, key], key))
+        nextKeyLocation = heapq.heappop(nextKeyLocationHeap)
+        nextKeyLocation = nextKeyLocation[1]
+        astarToNextLocation = harryAstar(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
+        # astarToNextLocation = harryBfs(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
+        nextKeySteps = astarToNextLocation[0]
+        nextKeyPath = astarToNextLocation[1]
+        remainingKeyLocations.remove(nextKeyLocation)
         currentLocation = nextKeyLocation
         steps += nextKeySteps
         path.append(nextKeyPath)
