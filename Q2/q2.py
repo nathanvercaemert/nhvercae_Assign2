@@ -5,6 +5,8 @@ from graph import Graph
 import math
 import heapq
 from collections import deque
+from python_tsp.exact import solve_tsp_dynamic_programming
+from python_tsp.heuristics import solve_tsp_simulated_annealing
 
 
 def distance(u, v):
@@ -37,6 +39,7 @@ def minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances):
             mst.add(v)
         includingDoor.discard(u)
         includingDoor.discard(v)
+    # print(weight)
     return weight
 
 
@@ -352,62 +355,65 @@ if search == 'astar':
     gStart = Graph()
     for key in keyLocations:
         gStart.add_vertex(key)
-    gStart.add_vertex(doorLocation)
-    gStart.add_vertex(currentLocation)
-    distances = {}
     dummyPathsExplored = 0
-    for u in gStart.vertices():
-        for v in gStart.vertices():
+    vertices = gStart.vertices()
+    distances = {}
+    index = 3
+    indexNames = {}
+    indexNames[1] = currentLocation
+    indexNames[2] = doorLocation
+    largeNumber = 1000000
+    for u in vertices:
+        for v in vertices:
             dist = harryAstar(u, v, isNavigable, isVisited, dummyPathsExplored)
             dist = dist[0]
             distances[(u, v)] = dist
             distances[(v, u)] = dist
-    remainingKeyLocations = keyLocations.copy()
-    # while True:
-    steps = 0
-    path = []
-    keyOrder = []
-    while remainingKeyLocations:
-        nextKey = ()
-        nextKeyLocation = ()
-        nextKeySteps = 0
-        nextKeyPath = ()
-        if (len(remainingKeyLocations) > 1):
-            possibleNextKeys = []
-            for keyLocation in remainingKeyLocations:
-                remainingAfterKeyRemoved = remainingKeyLocations.copy()
-                remainingAfterKeyRemoved.remove(keyLocation)
-                distToRemaining = distToMST(remainingAfterKeyRemoved, keyLocation, distances)
-                remainingMSTWeight = minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances)
-                astarToNextLocation = harryAstar(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
-                # astarToNextLocation = harryBfs(currentLocation, keyLocation, isNavigable, isVisited, pathsExplored)
-                distToKey = astarToNextLocation[0]
-                heuristic = remainingMSTWeight + distToRemaining + distToKey
-                heapq.heappush(possibleNextKeys, (heuristic, (keyLocation, astarToNextLocation)))
-            nextKey = heapq.heappop(possibleNextKeys)
-            nextKey = nextKey[1]
-            nextKeyLocation = nextKey[0]
-            nextKeySteps = nextKey[1][0]
-            nextKeyPath = nextKey[1][1]
-            remainingKeyLocations.remove(nextKeyLocation)
-        else:
-            # get the last key location
-            nextKeyLocation = next(iter(remainingKeyLocations))
-            astarToNextLocation = harryAstar(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
-            # astarToNextLocation = harryBfs(currentLocation, nextKeyLocation, isNavigable, isVisited, pathsExplored)
-            nextKeySteps = astarToNextLocation[0]
-            nextKeyPath = astarToNextLocation[1]
-            remainingKeyLocations.remove(nextKeyLocation)
-        currentLocation = nextKeyLocation
-        steps += nextKeySteps
-        path.append(nextKeyPath)
-        keyOrder.append(nextKeyLocation)
-    astarToDoor = harryAstar(currentLocation, doorLocation, isNavigable, isVisited, pathsExplored)
-    # astarToDoor = harryBfs(currentLocation, doorLocation, isNavigable, isVisited, pathsExplored)
-    steps += astarToDoor[0]
-    path.append(astarToDoor[1])
-    print(keyOrder)
-    print(steps)
-    print(path)
+        indexNames[index] = u
+        index += 1
+    for u in vertices:
+        dist = harryAstar(u, currentLocation, isNavigable, isVisited, dummyPathsExplored)
+        dist = dist[0]
+        distances[(u, currentLocation)] = dist
+        distances[(currentLocation, u)] = dist
+    for u in vertices:
+        dist = harryAstar(u, doorLocation, isNavigable, isVisited, dummyPathsExplored)
+        dist = dist[0]
+        distances[(u, doorLocation)] = dist
+        distances[(doorLocation, u)] = dist
+    # start to end
+    dist = harryAstar(currentLocation, doorLocation, isNavigable, isVisited, dummyPathsExplored)
+    dist = dist[0]
+    distances[(currentLocation, doorLocation)] = dist
+    distances[(doorLocation, currentLocation)] = dist
 
-# don't forget to store the number of paths expanded
+    # make connector index 0
+    # make start index 1
+    # make end index 2
+    # make start and end only connect on each other and solve tsp
+
+    arraySize = len(vertices) + 3
+    distance_matrix = numpy.zeros((arraySize, arraySize))
+    distance_matrix[0][1] = 1
+    distance_matrix[1][0] = distance_matrix[0][1]
+    distance_matrix[0][2] = 1
+    distance_matrix[2][0] = distance_matrix[0][2]
+    for i in range(3, arraySize):
+        distance_matrix[0][i] = largeNumber
+        distance_matrix[i][0] = largeNumber
+    keys = indexNames.keys()
+    for i in range(arraySize):
+        for j in range(arraySize):
+            if i in keys and j in keys:
+                if not i == j:
+                    distance_matrix[i][j] = distances[(indexNames[i], indexNames[j])]
+    # print(distance_matrix)
+    # permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
+    permutation, distance = solve_tsp_simulated_annealing(distance_matrix)
+    print(distance - 2)
+    path = []
+    for u in permutation:
+        if u == 0:
+            continue
+        path.append(indexNames[u])
+    # print(path)
