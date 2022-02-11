@@ -48,6 +48,66 @@ def distToMST(remainingAfterKeyRemoved, keyLocation):
     return heapq.heappop(distancesToKey)
 
 
+def harryAstar(currentLocation, nextLocation, isNavigable, isVisited):
+    possibleLocation = currentLocation
+    possibleCurrentRow = currentLocation[0]
+    possibleCurrentColumn = currentLocation[1]
+    possiblePath = []
+    mazeShape = isNavigable.shape
+    numRows = mazeShape[0]
+    numCols = mazeShape[1]
+    queue = deque()
+    isFailed = False
+    while True:
+        if isFailed:
+            print(possiblePath)
+            print('failure')
+            sys.exit()
+            break
+        # pathsExplored += 1
+        if possibleLocation is nextLocation:
+            isVisited.fill(0)
+            return (len(possiblePath), possiblePath)
+        if not isVisited[possibleCurrentRow, possibleCurrentColumn]:
+            isVisited[possibleCurrentRow, possibleCurrentColumn] = True
+            leftCol = possibleCurrentColumn
+            if possibleCurrentColumn > 0:
+                leftCol -= 1
+            left = (possibleCurrentRow, leftCol)
+            leftPath = possiblePath.copy()
+            leftPath.append(left)
+            queue.append((left, leftPath))
+            rightCol = possibleCurrentColumn
+            if possibleCurrentColumn < (numCols - 1):
+                rightCol += 1
+            right = (possibleCurrentRow, rightCol)
+            rightPath = possiblePath.copy()
+            rightPath.append(right)
+            queue.append((right, rightPath))
+            upRow = possibleCurrentRow
+            if possibleCurrentRow > 0:
+                upRow -= 1
+            up = (upRow, possibleCurrentColumn)
+            upPath = possiblePath.copy()
+            upPath.append(up)
+            queue.append((up, upPath))
+            downRow = possibleCurrentRow
+            if possibleCurrentRow < (numRows - 1):
+                downRow += 1
+            down = (downRow, possibleCurrentRow)
+            downPath = possiblePath.copy()
+            downPath.append(down)
+            queue.append((down, downPath))
+        if queue:
+            currentTest = queue.popleft()
+            possibleLocation = currentTest[0]
+            possiblePath = currentTest[1]
+            possibleCurrentRow = possibleLocation[0]
+            possibleCurrentColumn = possibleLocation[1]
+        else:
+            isFailed = True
+
+
 def extract_table(f):
     table = []
     for line in f:
@@ -174,13 +234,7 @@ if search == 'dfs':
 if search == 'bfs':
     isFailed = False
     queue = deque()
-    # test = 0
     while True:
-        # print(queue)
-        # print(currentPath)
-        # test += 1
-        # if test > 6:
-        #     break
         if isFailed:
             print('failure')
             break
@@ -228,8 +282,14 @@ if search == 'astar':
             distances[(v, u)] = distance(u, v)
     remainingKeyLocations = keyLocations.copy()
     # while True:
+    steps = 0
+    path = ()
+    keyOrder = ()
     while remainingKeyLocations:
         nextKey = ()
+        nextKeyLocation = ()
+        nextKeySteps = 0
+        nextKeyPath = ()
         if (len(remainingKeyLocations) > 1):
             possibleNextKeys = []
             for keyLocation in remainingKeyLocations:
@@ -237,19 +297,32 @@ if search == 'astar':
                 remainingAfterKeyRemoved.remove(keyLocation)
                 distToRemaining = distToMST(remainingAfterKeyRemoved, keyLocation)
                 remainingMSTWeight = minSpanTreeWeight(remainingAfterKeyRemoved, doorLocation, distances)
-                distToKey = distance(currentLocation, keyLocation)
+                astarToNextLocation = harryAstar(currentLocation, keyLocation, isNavigable, isVisited)
+                distToKey = astarToNextLocation[0]
                 heuristic = remainingMSTWeight + distToRemaining + distToKey
-                # heuristic = remainingMSTWeight
-                heapq.heappush(possibleNextKeys, (heuristic, keyLocation))
+                heapq.heappush(possibleNextKeys, (heuristic, (keyLocation, astarToNextLocation)))
             nextKey = heapq.heappop(possibleNextKeys)
             nextKey = nextKey[1]
+            nextKeyLocation = nextKey[0]
+            nextKeySteps = nextKey[1][0]
+            nextKeyPath = nextKey[1][1]
             remainingKeyLocations.remove(nextKey)
         else:
-            nextKey = next(iter(remainingKeyLocations))
-            remainingKeyLocations.remove(nextKey)
-        # go to next key/door with bfs
-        currentLocation = nextKey
-        # print('next key')
-        print(nextKey)
+            # get the last key location
+            nextKeyLocation = next(iter(remainingKeyLocations))
+            astarToNextLocation = harryAstar(currentLocation, nextKeyLocation, isNavigable, isVisited)
+            nextKeySteps = astarToNextLocation[0]
+            nextKeyPath = bfsToPossibleNextKey[1]
+            remainingKeyLocations.remove(nextKeyLocation)
+        currentLocation = nextKeyLocation
+        steps += nextKeySteps
+        path.append(nextKeyPath)
+        keyOrder.append(nextKeyLocation)
+    bfsToDoor = harryAstar(currentLocation, doorLocation, isNavigable, isVisited)
+    steps += bfsToDoor[0]
+    path.append(bfsToDoor[1])
+    print(keyOrder)
+    print(steps)
+    print(path)
 
 # don't forget to store the number of paths expanded
