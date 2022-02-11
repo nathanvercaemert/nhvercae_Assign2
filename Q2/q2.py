@@ -409,11 +409,23 @@ if search == 'astar':
                     distance_matrix[i][j] = distances[(indexNames[i], indexNames[j])]
     # print(distance_matrix)
     # permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
-    permutation, distance = solve_tsp_simulated_annealing(distance_matrix)
-    print(distance - 2)
-    path = []
+    permutation, TSPdistance = solve_tsp_simulated_annealing(distance_matrix)
+    pathFromTSP = deque()
     for u in permutation:
         if u == 0:
             continue
-        path.append(indexNames[u])
-    print(path)
+        pathFromTSP.append(indexNames[u])
+    currentLoc = pathFromTSP.popleft()
+    finalPath = []
+    finalPath.append(currentLoc)
+    while pathFromTSP:
+        nextLoc = pathFromTSP.popleft()
+        astarAgain = harryAstar(currentLoc, nextLoc, isNavigable, isVisited, pathsExplored)
+        for tup in astarAgain[1]:
+            finalPath.append(tup)
+        currentLoc = nextLoc
+    # finalPath = finalPath.reverse()
+    print(finalPath)
+    
+
+    #rever for maze5
