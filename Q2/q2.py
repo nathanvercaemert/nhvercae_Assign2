@@ -409,7 +409,7 @@ if search == 'astar':
                     distance_matrix[i][j] = distances[(indexNames[i], indexNames[j])]
     # print(distance_matrix)
     # permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
-    permutation, TSPdistance = solve_tsp_simulated_annealing(distance_matrix)
+    permutation, tspDistance = solve_tsp_simulated_annealing(distance_matrix)
     pathFromTSP = deque()
     for u in permutation:
         if u == 0:
@@ -424,7 +424,17 @@ if search == 'astar':
         for tup in astarAgain[1]:
             finalPath.append(tup)
         currentLoc = nextLoc
-    # finalPath = finalPath.reverse()
+        
+    if not finalPath[0] == (0, 0):
+        finalPath.reverse()
+
+    tspKeyOrder = []
+    for loc in finalPath:
+        if loc in keyLocations:
+            tspKeyOrder.append(loc)
+
+    print(tspKeyOrder)
+    print(tspDistance - 2)
     print(finalPath)
     
 
