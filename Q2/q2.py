@@ -7,6 +7,9 @@ import heapq
 from collections import deque
 
 
+# don't forget to comment code and make a readme
+
+
 def distance(u, v):
     xSquared = (int(u[0]) - int(v[0])) ** 2
     ySquared = (int(u[1]) - int(v[1])) ** 2
@@ -269,13 +272,7 @@ search = sys.argv[2]
 if search == 'dfs':
     isFailed = False
     stack = deque()
-    # test = 0
     while True:
-        # print(stack)
-        # print(currentPath)
-        # test += 1
-        # if test > 6:
-        #     break
         if isFailed:
             print('failure')
             break
@@ -363,7 +360,6 @@ if search == 'astar':
             distances[(u, v)] = dist
             distances[(v, u)] = dist
     remainingKeyLocations = keyLocations.copy()
-    # while True:
     steps = 0
     path = []
     keyOrder = []
@@ -390,8 +386,13 @@ if search == 'astar':
     # astarToDoor = harryBfs(currentLocation, doorLocation, isNavigable, isVisited, pathsExplored)
     steps += astarToDoor[0]
     path.append(astarToDoor[1])
+    
+    finalClosestKeyPath = []
+    finalClosestKeyPath.append((0, 0))
+    for subPath in path:
+        for loc in subPath:
+            finalClosestKeyPath.append(loc)
+   
     print(keyOrder)
-    print(steps)
-    print(path)
-
-# don't forget to store the number of paths expanded
+    print(steps)         
+    print(finalClosestKeyPath)
