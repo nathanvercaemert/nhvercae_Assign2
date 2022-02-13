@@ -180,6 +180,9 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             heapq.heappush(fringe, (possibleAStar, (down, downPath)))
         if fringe:
             fromFringe = heapq.heappop(fringe)
+            # testSame = heapq.top(fringe)
+            # if testSame == fromFring.fValue
+            # the useDirectrionPreference
             possibleCurrentLocation = fromFringe[1][0]
             possibleCurrentRow = possibleCurrentLocation[0]
             possibleCurrentColumn = possibleCurrentLocation[1]
