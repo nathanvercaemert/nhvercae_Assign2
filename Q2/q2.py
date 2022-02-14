@@ -131,7 +131,6 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
     numCols = mazeShape[1]
     fringe = []
     isFailed = False
-    test = 0
     while not possibleCurrentLocation == nextLocation:
         if isFailed:
             print('failure')
@@ -147,7 +146,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             leftPath = possiblePath.copy()
             leftPath.append(left)
             possibleAStar = len(leftPath) + distance(left, nextLocation)
-            heapq.heappush(fringe, (possibleAStar, (left, leftPath)))
+            heapq.heappush(fringe, (possibleAStar, ('L', (left, leftPath))))
             rightCol = possibleCurrentColumn
             if rightCol < (numCols - 1):
                 rightCol += 1
@@ -157,7 +156,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             rightPath = possiblePath.copy()
             rightPath.append(right)
             possibleAStar = len(rightPath) + distance(right, nextLocation)
-            heapq.heappush(fringe, (possibleAStar, (right, rightPath)))
+            heapq.heappush(fringe, (possibleAStar, ('R', (right, rightPath))))
             upRow = possibleCurrentRow
             if upRow > 0:
                 upRow -= 1
@@ -167,7 +166,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             upPath = possiblePath.copy()
             upPath.append(up)
             possibleAStar = len(upPath) + distance(up, nextLocation)
-            heapq.heappush(fringe, (possibleAStar, (up, upPath)))
+            heapq.heappush(fringe, (possibleAStar, ('U', (up, upPath))))
             downRow = possibleCurrentRow
             if downRow < (numRows - 1):
                 downRow += 1
@@ -177,16 +176,34 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             downPath = possiblePath.copy()
             downPath.append(down)
             possibleAStar = len(downPath) + distance(down, nextLocation)
-            heapq.heappush(fringe, (possibleAStar, (down, downPath)))
+            heapq.heappush(fringe, (possibleAStar, ('D', (down, downPath))))
         if fringe:
-            fromFringe = heapq.heappop(fringe)
-            # testSame = heapq.top(fringe)
-            # if testSame == fromFring.fValue
-            # the useDirectrionPreference
-            possibleCurrentLocation = fromFringe[1][0]
+            fromFringe = []
+            fromFringe.append(heapq.heappop(fringe))
+            selectedFromFringe = ()
+            if fringe:
+                while fringe and fringe[0][0] == fromFringe[0][0]:
+                    fromFringe.append(heapq.heappop(fringe))
+                for movement in fromFringe:
+                    # select from fringe based on direction preference if f-values are the same
+                    if movement[1][0] == 'U':
+                        selectedFromFringe = movement
+                    if movement[1][0] == 'L':
+                        selectedFromFringe = movement
+                    if movement[1][0] == 'D':
+                        selectedFromFringe = movement
+                    if movement[1][0] == 'R':
+                        selectedFromFringe = movement
+            else:
+                selectedFromFringe = fromFringe[0]
+            fromFringe.remove(selectedFromFringe)
+            while fromFringe:
+                # if there were other equal f-values, add them back to the fringe
+                heapq.heappush(fringe, fromFringe.pop())
+            possibleCurrentLocation = selectedFromFringe[1][1][0]
             possibleCurrentRow = possibleCurrentLocation[0]
             possibleCurrentColumn = possibleCurrentLocation[1]
-            possiblePath = fromFringe[1][1]
+            possiblePath = selectedFromFringe[1][1][1]
         else:
             isFailed = True
     isVisited.fill(0)
