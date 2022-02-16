@@ -1,0 +1,11 @@
+* Execution
+- Make sure that your shell is in this folder.
+- Locate the maze file you want to process.
+- Assumption: maze file is named MazeX.txt where X is the maze number.
+#+BEGIN_SRC shell
+  python3 q1.py ./MazeX.txt
+#+END_SRC
+* Solution
+#+BEGIN_SRC shell
+  ./Solutions/MazeX_solution.txt
+#+END_SRC

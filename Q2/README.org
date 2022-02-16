@@ -1,0 +1,15 @@
+* Execution
+- Make sure that your shell is in this folder.
+- Locate the maze file you want to process.
+- Assumption: maze file is named MazeX.txt where X is the maze number.
+- Decide on dfs/bfs/astar
+- Y = dfs/bfs/astar
+- Z = DFS/DFS/ASTAR
+- Z2 = DFS/BFS/ASTAR
+#+BEGIN_SRC shell
+  python3 q2.py ./Mazes/Z/MazeX.txt Y
+#+END_SRC
+* Solution
+#+BEGIN_SRC shell
+  ./Solutions/Z2/MazeX_solution.txt
+#+END_SRC
