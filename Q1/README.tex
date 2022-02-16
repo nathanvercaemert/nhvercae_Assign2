@@ -1,0 +1,48 @@
+% Created 2022-02-16 Wed 09:50
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{listings}
+\author{DESKTOP-OEFS7VE}
+\date{\today}
+\title{}
+\hypersetup{
+ pdfauthor={DESKTOP-OEFS7VE},
+ pdftitle={},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 27.2 (Org mode 9.5.1)}, 
+ pdflang={English}}
+\begin{document}
+
+\tableofcontents
+
+\section{Execution}
+\label{sec:org84fe664}
+\begin{itemize}
+\item Make sure that your shell is in this folder.
+\item Locate the case file you want to process.
+\item Assumption: case file is named caseX.txt where X is the case number.
+\end{itemize}
+\lstset{language=shell,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+python3 q1.py ./caseX.txt
+\end{lstlisting}
+\section{Solution}
+\label{sec:org7ef71ec}
+\lstset{language=shell,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+./Solutions/caseX_solution.txt
+\end{lstlisting}
+\end{document}

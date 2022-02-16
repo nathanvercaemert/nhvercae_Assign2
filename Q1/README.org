@@ -1,0 +1,11 @@
+* Execution
+- Make sure that your shell is in this folder.
+- Locate the case file you want to process.
+- Assumption: case file is named caseX.txt where X is the case number.
+#+BEGIN_SRC shell
+  python3 q1.py ./caseX.txt
+#+END_SRC
+* Solution
+#+BEGIN_SRC shell
+  ./Solutions/caseX_solution.txt
+#+END_SRC
