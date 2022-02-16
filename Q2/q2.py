@@ -24,25 +24,32 @@ def distance(u, v):
 
 
 def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplored):
-    isVisited.fill(0)
+    for i in range(len(isVisited)):
+        for j in range (len(isVisited[i])):
+            isVisited[i][j] = False
     possibleCurrentLocation = currentLocation
     possibleCurrentRow = possibleCurrentLocation[0]
     possibleCurrentColumn = possibleCurrentLocation[1]
     possiblePath = []
-    mazeShape = isNavigable.shape
+    mazeShape = (len(isNavigable), len(isNavigable[0]))
     numRows = mazeShape[0]
     numCols = mazeShape[1]
     fringe = []
     isFailed = False
+    # test = 0
     while not possibleCurrentLocation == nextLocation:
+        # if test < 2:
+        #     # print(fringe)
+        #     print(isVisited)
+        # test += 1
         if isFailed:
             return (largeNumber, ('None', [nextLocation]))
-        if not isVisited[possibleCurrentRow, possibleCurrentColumn]:
-            isVisited[possibleCurrentRow, possibleCurrentColumn] = True
+        if not isVisited[possibleCurrentRow][possibleCurrentColumn]:
+            isVisited[possibleCurrentRow][possibleCurrentColumn] = True
             leftCol = possibleCurrentColumn
             if leftCol > 0:
                 leftCol -= 1
-                if not isNavigable[possibleCurrentRow, leftCol]:
+                if not isNavigable[possibleCurrentRow][leftCol]:
                     leftCol = possibleCurrentColumn
             left = (possibleCurrentRow, leftCol)
             leftPath = possiblePath.copy()
@@ -52,7 +59,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             rightCol = possibleCurrentColumn
             if rightCol < (numCols - 1):
                 rightCol += 1
-                if not isNavigable[possibleCurrentRow, rightCol]:
+                if not isNavigable[possibleCurrentRow][rightCol]:
                     rightCol = possibleCurrentColumn
             right = (possibleCurrentRow, rightCol)
             rightPath = possiblePath.copy()
@@ -62,7 +69,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             upRow = possibleCurrentRow
             if upRow > 0:
                 upRow -= 1
-                if not isNavigable[upRow, possibleCurrentColumn]:
+                if not isNavigable[upRow][possibleCurrentColumn]:
                     upRow = possibleCurrentRow
             up = (upRow, possibleCurrentColumn)
             upPath = possiblePath.copy()
@@ -72,7 +79,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             downRow = possibleCurrentRow
             if downRow < (numRows - 1):
                 downRow += 1
-                if not isNavigable[downRow, possibleCurrentColumn]:
+                if not isNavigable[downRow][possibleCurrentColumn]:
                     downRow = possibleCurrentRow
             down = (downRow, possibleCurrentColumn)
             downPath = possiblePath.copy()
@@ -169,6 +176,15 @@ def go_down(isNavigable, location):
         newRow += 1
     return (newRow, currentColumn)
 
+def createMatrix(rowCount, colCount, initialize):
+    mat = []
+    for i in range(rowCount):
+        rowList = []
+        for j in range(colCount):
+            rowList.append(initialize)
+        mat.append(rowList)
+    return mat
+
 
 # main
 fileName = sys.argv[1]
@@ -176,11 +192,11 @@ with open(fileName, 'r') as f:
     maze = extract_table(f)
 mazeWidth = len(maze[0])
 mazeHeight = len(maze)
-isVisited = numpy.zeros((mazeHeight, mazeWidth), dtype=bool)
-isNavigable = numpy.zeros((mazeHeight, mazeWidth), dtype=bool)
-isDoor = numpy.zeros((mazeHeight, mazeWidth), dtype=bool)
+isVisited = createMatrix(mazeHeight, mazeWidth, False)
+isNavigable = createMatrix(mazeHeight, mazeWidth, False)
+isDoor = createMatrix(mazeHeight, mazeWidth, False)
 doorLocation = ()
-isKey = numpy.zeros((mazeHeight, mazeWidth), dtype=bool)
+isKey = createMatrix(mazeHeight, mazeWidth, False)
 keyLocations = []
 numKeys = 0
 keyLocations = set()
@@ -220,14 +236,14 @@ if search == 'dfs':
             output = 'Not possible'
             break
         pathsExplored += 1
-        if isDoor[currentRow, currentColumn]:
+        if isDoor[currentRow][currentColumn]:
             for tuple in currentPath:
                 output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
             output = output[:-1]
             print(pathsExplored)
             break
-        if not isVisited[currentRow, currentColumn]:
-            isVisited[currentRow, currentColumn] = True
+        if not isVisited[currentRow][currentColumn]:
+            isVisited[currentRow][currentColumn] = True
             down = go_down(isNavigable, currentLocation)
             downPath = currentPath.copy()
             downPath.append(down)
@@ -263,14 +279,14 @@ if search == 'bfs':
             output = 'Not possible'
             break
         pathsExplored += 1
-        if isDoor[currentRow, currentColumn]:
+        if isDoor[currentRow][currentColumn]:
             for tuple in currentPath:
                 output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
             output = output[:-1]
             print(pathsExplored)
             break
-        if not isVisited[currentRow, currentColumn]:
-            isVisited[currentRow, currentColumn] = True
+        if not isVisited[currentRow][currentColumn]:
+            isVisited[currentRow][currentColumn] = True
             left = go_left(isNavigable, currentLocation)
             leftPath = currentPath.copy()
             leftPath.append(left)
