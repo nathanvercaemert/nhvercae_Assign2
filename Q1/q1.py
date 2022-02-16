@@ -15,7 +15,8 @@ def extract_table(f):
 
 
 # main
-with open(sys.argv[1], 'r') as f:
+fileName = sys.argv[1]
+with open(fileName, 'r') as f:
     heuristic = extract_table(f)
     actual = extract_table(f)
 heuristicDict = {}
@@ -29,7 +30,7 @@ goal = set()
 for location, distance in heuristicDict.items():
     if distance == 0:
         goal.add(location)
-# is it assumed that we start at 'S'?
+# assumption: start location is 'S'
 currentLocation = 'S'
 currentPath = 'S'
 pathDistanceTravelled = 0
@@ -47,8 +48,18 @@ while currentLocation not in goal:
     currentLocation = fromFringe[1][0]
     currentPath = fromFringe[1][1][1]
     pathDistanceTravelled = fromFringe[1][1][0]
-print(currentPath)
-print(currentLocation)
-print(pathDistanceTravelled)
+# print(currentPath)
+# print(currentLocation)
+# print(pathDistanceTravelled)
 
-# output in tuple form
+fileName = fileName[:-4]
+fileName += '_solution.txt'
+prepend = './Solutions/'
+fileName = prepend + fileName
+
+output = '[\'' + currentPath + '\', ' + str(pathDistanceTravelled) + ']'
+# output = [currentPath, pathDistanceTravelled]
+
+f = open(fileName, "w")
+f.write(output)
+f.close()

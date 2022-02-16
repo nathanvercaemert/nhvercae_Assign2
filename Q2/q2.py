@@ -171,7 +171,8 @@ def go_down(isNavigable, location):
 
 
 # main
-with open(sys.argv[1], 'r') as f:
+fileName = sys.argv[1]
+with open(fileName, 'r') as f:
     maze = extract_table(f)
 mazeWidth = len(maze[0])
 mazeHeight = len(maze)
@@ -204,17 +205,25 @@ for i, row in enumerate(maze):
             currentColumn = j
             currentRow = i
             currentPath.append(currentLocation)
+
+output = ''
+            
 search = sys.argv[2]
 if search == 'dfs':
+    fileName = fileName.split('/')
+    fileName = fileName[-1][:-4]
+    fileName = './Solutions/DFS/' + fileName + '_solution.txt'
     isFailed = False
     stack = deque()
     while True:
         if isFailed:
-            print('failure')
+            output = 'Not possible'
             break
         pathsExplored += 1
         if isDoor[currentRow, currentColumn]:
-            print(currentPath)
+            for tuple in currentPath:
+                output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
+            output = output[:-1]
             print(pathsExplored)
             break
         if not isVisited[currentRow, currentColumn]:
@@ -244,15 +253,20 @@ if search == 'dfs':
         else:
             isFailed = True
 if search == 'bfs':
+    fileName = fileName.split('/')
+    fileName = fileName[-1][:-4]
+    fileName = './Solutions/BFS/' + fileName + '_solution.txt'
     isFailed = False
     queue = deque()
     while True:
         if isFailed:
-            print('failure')
+            output = 'Not possible'
             break
         pathsExplored += 1
         if isDoor[currentRow, currentColumn]:
-            print(currentPath)
+            for tuple in currentPath:
+                output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
+            output = output[:-1]
             print(pathsExplored)
             break
         if not isVisited[currentRow, currentColumn]:
@@ -282,6 +296,9 @@ if search == 'bfs':
         else:
             isFailed = True
 if search == 'astar':
+    fileName = fileName.split('/')
+    fileName = fileName[-1][:-4]
+    fileName = './Solutions/ASTAR/' + fileName + '_solution.txt'
     gStart = Graph()
     for key in keyLocations:
         gStart.add_vertex(key)
@@ -354,7 +371,24 @@ if search == 'astar':
     else:
         finalClosestKeyPath = "Not possible"
    
-    print(keyOrder)
-    print(steps)         
-    # print(path)
-    print(finalClosestKeyPath)
+    # print(keyOrder)
+    for tuple in keyOrder:
+        output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
+    if not output == '':
+        output = output[:-1]
+    # print(steps)         
+    output += '\n'
+    output += (str(steps) + '\n')
+    # print(finalClosestKeyPath)
+    if not finalClosestKeyPath == 'Not possible':
+        for tuple in finalClosestKeyPath:
+            output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
+        output = output[:-1]
+    else:
+        output += finalClosestKeyPath
+    # print(output)
+
+# output
+f = open(fileName, "w")
+f.write(output)
+f.close()
