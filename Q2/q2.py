@@ -1,5 +1,5 @@
 import sys
-import numpy
+#import numpy
 from collections import deque
 from graph import Graph
 import heapq
