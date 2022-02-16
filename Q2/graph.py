@@ -1,3 +1,4 @@
+# Dr. Don Sheehy's Graph
 class Graph:
     def __init__(self, V = {}, E = {}):
         self.E = set(frozenset((u, v)) for u, v in E)

@@ -3,8 +3,6 @@ from collections import deque
 from graph import Graph
 import heapq
 
-# don't forget to comment code and make a readme
-
 # coping with unreachable keys
 largeNumber = 1000000
 
@@ -15,13 +13,16 @@ def distance(u, v):
     # xSquared = (int(u[0]) - int(v[0])) ** 2
     # ySquared = (int(u[1]) - int(v[1])) ** 2
     # return math.sqrt(xSquared + ySquared)
-    
+
     # use Manhattan distance
     xDiff = abs(u[0] - v[0])
     yDiff = abs(u[1] - v[1])
     return xDiff + yDiff
 
 
+# calculate the astar between the current location and the next location
+# returns the cost-optimal distance and the path it would take
+# also returns the direction of the first move so that the specified priority of direction can be applied
 def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplored):
     for i in range(len(isVisited)):
         for j in range (len(isVisited[i])):
@@ -37,7 +38,9 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
     isFailed = False
     while not possibleCurrentLocation == nextLocation:
         if isFailed:
+            # not possible to reach the next location
             return (largeNumber, ('None', [nextLocation]))
+        # if the current location has not been visited, and the next possible moves/paths to the fringe
         if not isVisited[possibleCurrentRow][possibleCurrentColumn]:
             isVisited[possibleCurrentRow][possibleCurrentColumn] = True
             leftCol = possibleCurrentColumn
@@ -49,6 +52,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             leftPath = possiblePath.copy()
             leftPath.append(left)
             possibleAStar = len(leftPath) + distance(left, nextLocation)
+            # include the direction of the move so that priority to direction can be applied when removing from fringe
             heapq.heappush(fringe, (possibleAStar, ('L', (left, leftPath))))
             rightCol = possibleCurrentColumn
             if rightCol < (numCols - 1):
@@ -81,6 +85,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             possibleAStar = len(downPath) + distance(down, nextLocation)
             heapq.heappush(fringe, (possibleAStar, ('D', (down, downPath))))
         if fringe:
+            # get the next shortest possible path from the fringe based on direction preference if there are multiple equal distances
             fromFringe = []
             fromFringe.append(heapq.heappop(fringe))
             selectedFromFringe = ()
@@ -108,6 +113,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
             possibleCurrentColumn = possibleCurrentLocation[1]
             possiblePath = selectedFromFringe[1][1][1]
         else:
+            # the fringe was empty, so all paths have been explored
             isFailed = True
 
     # determine direction of first movement for prioritizing directions of equal A* searches
@@ -126,7 +132,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
     
     return (len(possiblePath), (firstDirection, possiblePath))
 
-
+# taken from stack overflow, used to parse CSV tables
 def extract_table(f):
     table = []
     for line in f:
@@ -137,6 +143,8 @@ def extract_table(f):
             fields[i] = word.strip()
         table.append(fields)
     return table
+
+# functions to fly on Harry's broom for Scenario 1
 
 
 def go_left(isNavigable, location):
@@ -170,6 +178,8 @@ def go_down(isNavigable, location):
         newRow += 1
     return (newRow, currentColumn)
 
+
+# taken from stack overflow, used to create a matrix instead of numpy
 def createMatrix(rowCount, colCount, initialize):
     mat = []
     for i in range(rowCount):
@@ -217,7 +227,7 @@ for i, row in enumerate(maze):
             currentPath.append(currentLocation)
 
 output = ''
-            
+
 search = sys.argv[2]
 if search == 'dfs':
     fileName = fileName.split('/')
@@ -315,12 +325,14 @@ if search == 'astar':
     gStart.add_vertex(doorLocation)
     gStart.add_vertex(currentLocation)
     distances = {}
+    # compute the complete astar distance matrix of all of the locations
     for u in gStart.vertices():
         for v in gStart.vertices():
-            astarUV = harryAstar(u, v, isNavigable, isVisited, pathsExplored)            
-            astarVU = harryAstar(v, u, isNavigable, isVisited, pathsExplored)            
+            astarUV = harryAstar(u, v, isNavigable, isVisited, pathsExplored)
+            astarVU = harryAstar(v, u, isNavigable, isVisited, pathsExplored)
             distances[(u, v)] = astarUV
             distances[(v, u)] = astarVU
+    # what keys are left to collect?
     remainingKeyLocations = keyLocations.copy()
     steps = 0
     path = []
@@ -338,11 +350,11 @@ if search == 'astar':
         nextClosestKeys = [heapq.heappop(nextKeyLocationHeap)]
 
         # coping with unreachable key
+        # this removes the keys from the remainingKeyLocations
+        # a key is unreachable if its astar was computed to be largeNumber
         tempNextClosestKey = nextClosestKeys[0]
         if tempNextClosestKey[0] == largeNumber:
             steps = -1
-            # print(remainingKeyLocations)
-            # print(tempNextClosestKey)
             remainingKeyLocations.remove(tempNextClosestKey[1][1][-1])
             continue
         
@@ -380,23 +392,20 @@ if search == 'astar':
                 finalClosestKeyPath.append(loc)
     else:
         finalClosestKeyPath = "Not possible"
-   
-    # print(keyOrder)
+
+    # output
     for tuple in keyOrder:
         output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
     if not output == '':
         output = output[:-1]
-    # print(steps)         
     output += '\n'
     output += (str(steps) + '\n')
-    # print(finalClosestKeyPath)
     if not finalClosestKeyPath == 'Not possible':
         for tuple in finalClosestKeyPath:
             output += '(' + str(tuple[0]) + ', ' + str(tuple[1]) + '),'
         output = output[:-1]
     else:
         output += finalClosestKeyPath
-    # print(output)
 
 # output
 f = open(fileName, "w")
