@@ -1,0 +1,75 @@
+% Created 2022-02-16 Wed 08:59
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{placeins}
+\author{Nathan Vercaemert}
+\date{\today}
+\title{Assignment 2\\\medskip
+\large CSC 520 Spring 2022 001}
+\hypersetup{
+ pdfauthor={Nathan Vercaemert},
+ pdftitle={Assignment 2},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 27.2 (Org mode 9.5.1)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Question 1}
+\label{sec:org89bfce6}
+Execution instructions and solutions locations explained:
+\lstset{language=shell,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+./Q1/README.ORG
+\end{lstlisting}
+\section{Question 2}
+\label{sec:orgca561b8}
+Execution instructions and solutions locations explained:
+\lstset{language=shell,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+./Q2/README.ORG
+\end{lstlisting}
+\subsection{Heuristic Explained}
+\label{sec:org045795e}
+In navigating from A to B, where A and B are either (0, 0), a key, or the door (in that order), Manhattan distance is used as a heuristic.
+\subsubsection{Admissibility}
+\label{sec:orgc63c2c1}
+Manhattan distance will never overestimate the distance that Harry must travel because the Manhattan distance is the shortest path that Harry can travel. Harry will only ever take this path if it is unobstructed.
+\subsubsection{Consistency}
+\label{sec:org30597dc}
+Similarly to \hyperref[sec:orgc63c2c1]{Admissibility}, the heuristic is consistent because the shortest path that Harry can take to an intermediate location (if unobstructed) is the Manhattan distance. If the intermediate location is on the path to the destination, then the total cost to/from the intermediate location will be equal to the direct cost to the destination. Otherwise, the total distance to/from the intermediate location will be greater than the direct cost to the destination. This is a property of euclidean space; our mazes are an abstraction of euclidean space.
+\subsection{Paths Expanded}
+\label{sec:orgbb7eab6}
+\begin{center}
+\begin{tabular}{rrr}
+Maze & DFS & BFS\\
+\hline
+1 & 30 & 40\\
+2 &  & \\
+3 & 24 & 27\\
+4 &  & \\
+5 & 96 & 50\\
+\end{tabular}
+\end{center}
+\subsubsection{Comparison}
+\label{sec:org3b41eb5}
+With small mazes, DFS is able to find a solution with fewer paths. As the size of the maze increases, DFS runs the risk of searching more unsuccessful paths.
+
+Ultimately, there is a relationship between the distance to the portal (from Harry) and the size of the maze. Because BFS expands incrementally, it will perform better that DFS when the maze is close to Harry and the maze is large (unless DFS "gets lucky" and the portal is located on a high priority path). As the size of the maze increases, the number of deep paths without a solution increases.
+\end{document}
