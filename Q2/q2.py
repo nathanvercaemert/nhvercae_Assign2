@@ -1,5 +1,4 @@
 import sys
-#import numpy
 from collections import deque
 from graph import Graph
 import heapq
@@ -36,12 +35,7 @@ def harryAstar(currentLocation, nextLocation, isNavigable, isVisited, pathsExplo
     numCols = mazeShape[1]
     fringe = []
     isFailed = False
-    # test = 0
     while not possibleCurrentLocation == nextLocation:
-        # if test < 2:
-        #     # print(fringe)
-        #     print(isVisited)
-        # test += 1
         if isFailed:
             return (largeNumber, ('None', [nextLocation]))
         if not isVisited[possibleCurrentRow][possibleCurrentColumn]:
